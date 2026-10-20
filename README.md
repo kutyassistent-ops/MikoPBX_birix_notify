@@ -1,8 +1,15 @@
-# ModuleBitrixNotify — уведомления MikoPBX в Битрикс24
+# ModuleBitrixNotify
 
-Модуль расширения MikoPBX. Отправляет в чат Битрикс24 уведомления о звонках через входящий вебхук (`im.notify`): пропущенные, входящие в реальном времени и произвольные сообщения через REST API.
+**Уведомления MikoPBX в Битрикс24.** Модуль расширения MikoPBX: отправляет в
+чат Битрикс24 уведомления о звонках через входящий вебхук (`im.notify`) —
+пропущенные, входящие в реальном времени и произвольные сообщения через
+REST API.
 
-Лицензия: GPL v3.
+![Страница настроек модуля](docs/screenshot-settings.jpg)
+
+Версия `2.0.10` · GPL-3.0-or-later · PHP 8.4 · MikoPBX 2024.1.0+
+
+---
 
 ## Возможности
 
@@ -18,6 +25,8 @@
 | Диагностика на странице     | Кнопки «Проверить подключение», «Тест пропущенного», «Тестовое сообщение»                                         |
 | Интерактивный UI            | Панель диагностики: режим воркера, портал, источник токена, получатели                                            |
 
+---
+
 ## Совместимость
 
 `min_pbx_version` — **2024.1.0**. Против ядра MikoPBX проверено по тегам репозитория:
@@ -31,13 +40,19 @@
 
 Колонки CDR `src_name`/`dst_name` существуют с 2026.1; на более старых ядрах имя звонящего в уведомлении будет пустым — это штатно.
 
+---
+
 ## Установка
 
-1. Возьмите zip: `dist/ModuleBitrixNotify-2.0.10.zip`.
+1. Возьмите zip: [`dist/ModuleBitrixNotify-2.0.10.zip`](dist/ModuleBitrixNotify-2.0.10.zip).
 2. Админка MikoPBX → **Модули расширения → Загрузить новый модуль** → выберите zip.
 3. Включите модуль.
 
 Настройки: **Настройки → Уведомления в Битрикс24** (пункт появляется в меню модулей после установки).
+
+> [!warning] `module.json` должен лежать в корне архива
+> Если модуль упакован в папку `ModuleBitrixNotify/`, установка падает с
+> «module.json not found in the module archive».
 
 ### Как получить вебхук Битрикс24
 
@@ -54,11 +69,13 @@
 ### Приоритет источника токена
 
 1. Поле «Токен» в настройках модуля;
-2. токен из полного URL вебхука (поле «Вебхук Bitrix24»);
+2. токен из полного URL вебхука (поле «Вебхук Битрикс24»);
 3. переменная окружения `BX_WEBHOOK_TOKEN`;
 4. файл `/etc/bitrix-webhook-token` (600, root) на хосте MikoPBX.
 
 Пустое поле на странице настроек **не затирает** сохранённый токен.
+
+---
 
 ## REST API модуля
 
@@ -80,12 +97,14 @@ curl -X POST -H "Authorization: Bearer $KEY" -d "dst=201" \
   https://<PBX>/pbxcore/api/modules/ModuleBitrixNotify/test-missed
 ```
 
-Публичный endpoint (включается тумблером + секрет, см. подробнее в `docs/API.md`):
+Публичный endpoint (включается тумблером + секрет, см. подробнее в [`docs/API.md`](docs/API.md)):
 
 ```bash
 curl -X POST https://<PBX>/pbxcore/api/modules/ModuleBitrixNotify/public/send \
   -d "secret=$SECRET" -d "text=Backup finished" -d "uid=1711"
 ```
+
+---
 
 ## Архитектура
 
@@ -103,11 +122,51 @@ REST:
 
 Код следует официальным паттернам: ModuleTemplate (структура/установка), ModuleTelegramNotify (AMI-воркер `CdrConnector`), MikoPBX-Development-Examples Pattern 2 (REST с дополнительными роутами).
 
+---
+
+## Структура репозитория
+
+```
+ModuleBitrixNotify/
+├── App/
+│   ├── Module.php                        точка входа модуля
+│   ├── Controllers/                      обработчики страницы настроек
+│   ├── Forms/                            форма настроек
+│   └── Views/index.volt                  шаблон страницы настроек
+├── Lib/
+│   ├── BitrixNotifyConf.php              настройки
+│   ├── BitrixNotifyMain.php              точка входа воркеров
+│   ├── BitrixNotifySettings.php          провайдер настроек
+│   ├── BitrixNotifyState.php             антифлуд и состояние
+│   ├── BitrixRestApi.php                 вызовы REST Битрикс24
+│   ├── BitrixTemplates.php               шаблоны сообщений
+│   ├── WorkerBitrixNotifyAMI.php         воркер входящих (AMI)
+│   ├── WorkerBitrixNotifyCdr.php         воркер пропущенных (CDR)
+│   └── RestAPI/                          процессор REST и действия
+├── Messages/                             локализация ru / en
+├── Models/                               модель настроек
+├── Setup/                                установка и обновление
+├── public/assets/                        css и js страницы
+├── docs/
+│   ├── API.md                            HTTP API: параметры, ответы, примеры
+│   ├── TROUBLESHOOTING.md                диагностика, типовые проблемы
+│   └── screenshot-settings.jpg           скриншот страницы настроек
+├── dist/                                 готовый zip для установки
+├── CHANGELOG.md                          история версий
+├── LICENSE                               GPL-3.0
+├── composer.json
+└── module.json
+```
+
+---
+
 ## Файлы документации
 
-- `docs/API.md` — HTTP API: параметры, ответы, примеры;
-- `docs/TROUBLESHOOTING.md` — диагностика, типовые проблемы;
-- `CHANGELOG.md` — история версий.
+- [`docs/API.md`](docs/API.md) — HTTP API: параметры, ответы, примеры;
+- [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) — диагностика, типовые проблемы;
+- [`CHANGELOG.md`](CHANGELOG.md) — история версий.
+
+---
 
 ## Проверено / не проверено
 
@@ -127,3 +186,13 @@ REST:
 - `php -l` всех файлов (PHP CLI на машине сборки отсутствует); на АТС модуль исполняется без ошибок;
 - живой пропущенный звонок (синтетический тест работает, CDR-воркер запущен);
 - обновление с 1.x на 2.0 на копии (механизм проверен по исходникам ядра).
+
+---
+
+## Связанные проекты
+
+| Проект | Роль |
+|---|---|
+| [`grafana-bitrix-relay`](https://github.com/kutyassistent-ops/grafana-bitrix-relay) | Доставка алертов из Grafana в Битрикс24 — тем же методом `im.notify` |
+| [`grafana-dashboards`](https://github.com/kutyassistent-ops/grafana-dashboards) | Дашборды и правила алертинга |
+| [`MikoPBX_Prometheus`](https://github.com/kutyassistent-ops/MikoPBX_Prometheus) | Экспортёр метрик MikoPBX в формате Prometheus |

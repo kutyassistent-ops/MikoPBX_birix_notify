@@ -1,0 +1,19 @@
+# Локальное окружение
+.env
+.env.local
+*.log
+
+# PHP
+/vendor/
+composer.lock
+*.cache
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Архивы сборки, кроме готового dist/*.zip
+*.zip
+!dist/*.zip
