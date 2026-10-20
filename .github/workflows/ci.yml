@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Проверка PHP
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: php -l по всем файлам
+        run: |
+          find . -name '*.php' -not -path './.git/*' -print0 \
+            | xargs -0 -n1 -P4 php -l
+
+  package:
+    name: Проверка архива
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Проверить раскладку готового архива
+        run: |
+          set -e
+          for zip in dist/*.zip; do
+              echo "== $zip"
+              if ! unzip -l "$zip" | grep -qE ' +module\.json$'; then
+                  echo "::error::В $zip module.json лежит не в корне — установка в MikoPBX упадёт"
+                  exit 1
+              fi
+              if unzip -l "$zip" | grep -qE ' +[^ ]+\\[^ ]+$'; then
+                  echo "::error::В $zip записи с обратными слэшами"
+                  exit 1
+              fi
+              unzip -l "$zip" | tail -1
+          done
