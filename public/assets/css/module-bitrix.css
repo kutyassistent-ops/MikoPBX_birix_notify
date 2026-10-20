@@ -1,0 +1,44 @@
+/*
+ * MikoPBX ModuleBitrixNotify — стили страницы настроек.
+ */
+
+.module-bx-grid .column {
+    padding-top: 0.5em;
+}
+
+.module-bx-grid .attached.segment {
+    background-color: #ffffff;
+}
+
+/* Диагностика: компактные результаты */
+.module-bx-result .ui.list {
+    font-size: 1em;
+    margin-bottom: 0;
+}
+
+.module-bx-result span {
+    font-weight: 600;
+}
+
+#public-api-url {
+    word-break: break-all;
+    background: #f2f2f2;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+/* Справочный блок */
+.module-bx-help .item {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Иконки-подсказки */
+.module-bx-popup {
+    color: #2185d0;
+    cursor: help;
+}

@@ -1,0 +1,24 @@
+{
+    "name": "local/modulebitrixnotify",
+    "description": "ModuleBitrixNotify - Bitrix24 notifications for missed and incoming calls",
+    "require": {
+        "mikopbx/core": ">=2024.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ModuleBitrixNotify\\": "/"
+        }
+    },
+    "type": "application",
+    "keywords": [
+        "pbx",
+        "asterisk",
+        "mikopbx",
+        "sip",
+        "voip",
+        "phalcon",
+        "telephony",
+        "bitrix24"
+    ],
+    "license": "GPL-3.0-or-later"
+}
